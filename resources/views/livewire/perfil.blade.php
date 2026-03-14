@@ -30,7 +30,21 @@
                                 <h1 class="situacao-do-pix" style=" background-color: #dc3545;">Erro no processamento...<p>Favor entrar em contato conosco!!</p></h1>
                         @endswitch
                     <!-- <a href="" class="infos-pessoas">Informações Pessoais</a> -->
+                    <h1 class="qrcode">Qr code para marcar sua presença:<br></h1>
+                    <div id="qrcode"></div>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            let pid = "{{$participante->pid}}";
+                            new QRCode(document.getElementById("qrcode"),{
+                                text: pid,
+                                width: 150,
+                                height: 150
+                            });
+                        });
+                    </script>
                 </div>
+
             </div>
         @endif
 
