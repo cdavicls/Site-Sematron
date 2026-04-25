@@ -34,10 +34,10 @@ new class extends Component
         $all_visits =  Event::where('type', 'viagem')->where('sid', env('ATUAL_SID'))->get();
         $available_visits = [];
         foreach ($all_visits as $event) {
-            $subscribed_count = Inscricao::where('minicurso', $event->id)->count();
+            $subscribed_count = Inscricao::where('viagem', $event->eid)->count();
             if ($subscribed_count < $event->slots) {
                 $available_visits[] = $event;
-            }
+            } 
         }
 
         return $available_visits;
@@ -50,7 +50,7 @@ new class extends Component
         $all_minicourses = Event::where('type', 'minicurso')->where('sid', env('ATUAL_SID'))->get();
         $available_minicourses = [];
         foreach ($all_minicourses as $event) {
-            $subscribed_count = Inscricao::where('minicurso', $event->id)->count();
+            $subscribed_count = Inscricao::where('minicurso', $event->eid)->count();
             if ($subscribed_count < $event->slots) {
                 $available_minicourses[] = $event;
             }

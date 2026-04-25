@@ -29,20 +29,32 @@ class GeneralController extends Controller
     }
     public function minicursos()
     {
-        $mcursos = Event::where([
-            ['type', 'minicurso'],
-            ['sid', config('general.sematron_atual')]
-        ])->get();
-        return view('minicursos', ['mcursos' => $mcursos]);
+    $all_minicursos =  Event::where('type', 'minicurso')->where('sid', env('ATUAL_SID'))->get();
+    $available_minicursos = [];
+    foreach ($all_minicursos as $event) {
+        $subscribed_count = Inscricao::where('minicurso', $event->eid)->count();
+        if ($subscribed_count < $event->slots) {
+            $event->slots = $event->slots - $subscribed_count; // Atualiza os slots disponíveis
+            $available_minicursos[] = $event;
+        }
+    }
+
+    return view('minicursos', ['mcursos' => $available_minicursos]);
     }
     public function visitas()
     {
-        $visitas = Event::where([
-            ['type', 'viagem'],
-            ['sid', config('general.sematron_atual')]
-        ])->get();
-        return view('visitas', ['visitas' => $visitas]);
-}
+    $all_visits =  Event::where('type', 'viagem')->where('sid', env('ATUAL_SID'))->get();
+    $available_visits = [];
+    foreach ($all_visits as $event) {
+        $subscribed_count = Inscricao::where('viagem', $event->eid)->count();
+        if ($subscribed_count < $event->slots) {
+            $event->slots = $event->slots - $subscribed_count; // Atualiza os slots disponíveis
+            $available_visits[] = $event;
+        }
+    }
+
+    return view('visitas', ['visitas' => $available_visits]);
+    }
 
     public function palestras()
     {

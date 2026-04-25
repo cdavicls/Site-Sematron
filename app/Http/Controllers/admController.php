@@ -11,15 +11,24 @@ class admController extends Controller
      public function showInscList()
     {  
         $resultados = DB::select('SELECT 
-                                    userdata.uid, 
-                                    userinfos.name, 
-                                    userinfos.email, 
-                                    userinfos.cpf, 
-                                    sales.code 
-                                 FROM userdata
-                                 INNER JOIN userinfos ON userdata.uid = userinfos.uid
-                                 INNER JOIN sales ON userdata.pid = sales.pid
-                                 WHERE userdata.sid = 22');
+                                        userdata.uid, 
+                                        userdata.pid,
+                                        userinfos.name, 
+                                        userinfos.email, 
+                                        userinfos.cpf,
+                                        userinfos.rg,
+                                        userinfos.inst,
+                                        userinfos.nusp,
+                                        userinfos.tel,
+                                        sales.code,
+                                        sales.status as sales_status,
+                                        userdata.status as status_usuario,
+                                        events.name as viagem_usuario
+                                    FROM userdata
+                                    INNER JOIN userinfos ON userdata.uid = userinfos.uid
+                                    INNER JOIN sales ON userdata.pid = sales.pid
+                                    INNER JOIN events ON userdata.viagem = events.eid
+                                    WHERE userdata.sid = 22');
     
         return view('adm_list_insc',['participantes' => $resultados]);
     }
