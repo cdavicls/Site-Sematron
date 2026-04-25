@@ -27,7 +27,7 @@ class admController extends Controller
                                     FROM userdata
                                     INNER JOIN userinfos ON userdata.uid = userinfos.uid
                                     INNER JOIN sales ON userdata.pid = sales.pid
-                                    INNER JOIN events ON userdata.viagem = events.eid
+                                    LEFT JOIN events ON userdata.viagem = events.eid
                                     WHERE userdata.sid = 22');
     
         return view('adm_list_insc',['participantes' => $resultados]);
