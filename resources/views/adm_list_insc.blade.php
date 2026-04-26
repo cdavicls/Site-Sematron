@@ -15,6 +15,7 @@
     <tr>
         {{-- AGORA TEMOS 8 CABEÇALHOS PARA BATER COM OS 8 DADOS --}}
         <th>Nome Completo</th>
+        <th>Pacote</th>
         <th>Status Conta</th>
         <th>Viagem</th>
         <th>RG</th>
@@ -35,6 +36,7 @@
         @foreach($participantes as $p)
         <tr>
             <td>{{ $p->name }}</td> 
+            <td>{{ $p->pack_usuario }}</td>
             <td><span class="badge-status">{{ $p->status_usuario }}</span></td>
             <td>{{ $p->viagem_usuario ?? 'Nenhuma' }}</td>
             <td>{{ $p->rg }}</td>
