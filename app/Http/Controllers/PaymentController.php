@@ -19,7 +19,7 @@ class PaymentController extends Controller
         $user = Auth::user();
         
         if ($inscricao->alojamento) {
-            $preco = $inscricao->pack->preço + 100; // Exemplo de valor adicional para alojamento
+            $preco = $inscricao->pack->preço + 85; // Exemplo de valor adicional para alojamento
             $pack_name = $inscricao->pack->nome . ' com Alojamento';
             $title = 'Inscrição Sematron - ' . $pack_name;
         } else {
