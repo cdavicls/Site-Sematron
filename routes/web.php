@@ -28,6 +28,7 @@ Route::get('/', GeneralController::class . '@inicio')->name('inicio');
 Route::get('/inicio', fn () => redirect('/'))->name('inicio.redirect');
 
 
+
 Route::get('/', fn () => view('inicio'))->name('home');
 
 Route::get('/inscricao' , fn () => redirect('inscricao/create'));
@@ -42,6 +43,9 @@ Route::get('/minicursos', GeneralController::class . '@minicursos')->name('minic
 Route::get('/visitas', GeneralController::class . '@visitas')->name('visitas');
 
 Route::get('/palestras', GeneralController::class . '@palestras')->name('palestras');
+
+Route::get('/leitor', [LeitorController::class, 'index'])->middleware('auth');
+Route::post('/presenca', [LeitorController::class, 'registrar']) ->name('registrar.presenca')->middleware('auth');
 
 Route::get('/leitor', [LeitorController::class, 'index'])->middleware('auth');
 Route::post('/presenca', [LeitorController::class, 'registrar']) ->name('registrar.presenca')->middleware('auth');
