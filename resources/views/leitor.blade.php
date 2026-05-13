@@ -53,7 +53,7 @@
             #reader video {
                 width: 100% !important;
                 height: 100% !important;
-                object-fit: cover;
+                object-fit: contain;
             }
             </style>
         </section>
@@ -63,6 +63,7 @@
             console.log('leitor.js: script carregado');
 
             let eventoSelecionado = null;
+            let isScanning = true; // Flag para controlar o cooldown do scanner
 
             function selecionarEvento(eid, elemento) {
                 console.log('leitor.js: evento selecionado', eid);
@@ -79,57 +80,95 @@
             const html5QrCode = new Html5Qrcode("reader");
             console.log('leitor.js: Html5Qrcode instanciado');
 
-            Html5Qrcode.getCameras().then(devices => {
-                console.log('leitor.js: câmeras encontradas', devices);
-                if (devices && devices.length) {
-                    const cameraId = devices[0].id;
-                    console.log('leitor.js: usando câmera', cameraId);
-                    html5QrCode.start(
-                        cameraId,
-                        {
-                            fps: 10,
-                            qrbox: { width: 250, height: 250 }
-                        },
-                        (decodedText) => {
-                            console.log('leitor.js: QR detectado', decodedText);
-                            onScanSuccess(decodedText);
-                        },
-                        (errorMessage) => {
-                            console.debug('leitor.js: erro de scan parcial', errorMessage);
-                        }
-                    ).then(() => {
-                        console.log('leitor.js: leitura iniciada com sucesso');
-                    }).catch(err => {
-                        console.error('leitor.js: erro ao iniciar o leitor', err);
-                        alert('Não foi possível iniciar a câmera. Verifique as permissões e se há uma câmera disponível.');
-                    });
-                } else {
-                    console.warn('leitor.js: nenhuma câmera disponível');
-                    alert('Nenhuma câmera encontrada. Verifique seu dispositivo.');
+            // Função para gerar um som de "bip"
+            function playBeep() {
+                try {
+                    const context = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = context.createOscillator();
+                    const gainNode = context.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(context.destination);
+                    gainNode.gain.value = 0.1;
+                    oscillator.frequency.value = 880;
+                    oscillator.type = 'sine';
+                    oscillator.start();
+                    setTimeout(() => oscillator.stop(), 150);
+                } catch (e) {
+                    console.warn("Não foi possível reproduzir o som de bip.", e);
                 }
+            }
+
+            // Função para tornar a caixa de scan responsiva
+            const qrboxFunction = (viewfinderWidth, viewfinderHeight) => {
+                const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+                const qrboxSize = Math.floor(minEdge * 0.8); // Usa 80% da menor dimensão
+                return { width: qrboxSize, height: qrboxSize };
+            };
+
+            // Tenta usar a câmera traseira (environment) diretamente, que possui foco automático
+            html5QrCode.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: qrboxFunction
+                },
+                (decodedText) => {
+                    console.log('leitor.js: QR detectado', decodedText);
+                    onScanSuccess(decodedText);
+                },
+                (errorMessage) => {
+                    // console.debug('leitor.js: erro de scan parcial', errorMessage); // Comentado para evitar flood no console
+                }
+            ).then(() => {
+                console.log('leitor.js: leitura iniciada com sucesso');
             }).catch(err => {
-                console.error('leitor.js: erro ao buscar câmeras', err);
-                alert('Não foi possível acessar as câmeras. Permita o uso da câmera no navegador.');
+                console.error('leitor.js: erro ao iniciar o leitor', err);
+                alert('Não foi possível iniciar a câmera. Verifique permissões (HTTPS ou localhost necessário).');
             });
 
             function onScanSuccess(decodedText) {
+                if (!isScanning) {
+                    return; // Ignora scans durante o cooldown
+                }
+                isScanning = false; // Desativa o scan para evitar leituras múltiplas
+
+                playBeep(); // Feedback sonoro imediato
+                html5QrCode.pause(); // Pausa o scanner visualmente
+
                 console.log('leitor.js: onScanSuccess chamado', decodedText);
                 if (!eventoSelecionado) {
                     console.warn('leitor.js: sem evento selecionado');
                     alert("Selecione a palestra antes de escanear!");
+                    // Reativa o scanner imediatamente em caso de erro do usuário
+                    html5QrCode.resume();
+                    isScanning = true;
                     return;
                 }
 
                 let pid = decodedText;
                 console.log('leitor.js: decodedText inicial', pid);
 
-                if (decodedText.includes("http")) {
-                    let url = new URL(decodedText);
-                    pid = url.searchParams.get("pid");
-                    console.log('leitor.js: pid extraído da URL', pid);
+                try {
+                    if (decodedText.includes("http")) {
+                        let url = new URL(decodedText);
+                        pid = url.searchParams.get("pid");
+                        console.log('leitor.js: pid extraído da URL', pid);
+                    }
+                } catch (e) {
+                    alert("QR Code com formato de URL inválido.");
+                    html5QrCode.resume();
+                    isScanning = true;
+                    return;
                 }
 
                 enviarPresenca(pid);
+
+                // Define um cooldown para reativar o scanner
+                setTimeout(() => {
+                    html5QrCode.resume();
+                    isScanning = true;
+                    console.log('leitor.js: Leitor reativado.');
+                }, 3000); // Cooldown de 3 segundos
             }
 
             function enviarPresenca(pid) {
