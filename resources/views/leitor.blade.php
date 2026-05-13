@@ -47,15 +47,16 @@
     #toast.error { background-color: #dc3545; }
     #toast.warning { background-color: #ffc107; color: #000; }
 
-    /* Evento Selecionado */
-    .borda-visitas.selecionado {
-        border-color: #28a745;
-        box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
-        opacity: 1 !important;
-    }
-
-    .borda-visitas {
-        transition: opacity 0.3s, border-color 0.3s;
+    /* Select de Eventos */
+    #seletor-evento {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 8px;
+        font-size: 16px;
+        background-color: #111;
+        color: white;
+        border: 2px solid var(--laranja);
+        cursor: pointer;
     }
 </style>
 
@@ -68,23 +69,20 @@
 
     {{-- ===================== LISTA DE EVENTOS ===================== --}}
     <div id="lista-eventos">
-        @forelse($eventos as $evento)
-            <div class="borda-visitas" data-eid="{{ $evento->eid }}">
-                <div class="texto-na-esquerda">
-                    <h1 class="nome-da-visita">{{ $evento->name }}</h1>
-                    <h1 class="horarios-visitas">
-                        {{ \Carbon\Carbon::parse($evento->start)->format('H:i') }}
-                        •
-                        {{ \Carbon\Carbon::parse($evento->end)->format('H:i') }}
-                    </h1>
-                </div>
-                <button class="botao-inscrever botao-selecionar" onclick="selecionarEvento({{ $evento->eid }}, this)">Selecionar</button>
-            </div>
-        @empty
+        @if(count($eventos) > 0)
+            <select id="seletor-evento" onchange="selecionarEvento(this.value)">
+                <option value="">Selecione a palestra...</option>
+                @foreach($eventos as $evento)
+                    <option value="{{ $evento->eid }}">
+                        {{ $evento->name }} ({{ \Carbon\Carbon::parse($evento->start)->format('H:i') }} às {{ \Carbon\Carbon::parse($evento->end)->format('H:i') }})
+                    </option>
+                @endforeach
+            </select>
+        @else
             <p style="color:#888; text-align:center; margin:20px 0;">
                 Nenhum evento disponível no momento.
             </p>
-        @endforelse
+        @endif
     </div>
 
     {{-- ===================== SCANNER ===================== --}}
@@ -124,21 +122,13 @@
         }, 3000);
     }
 
-    window.selecionarEvento = function(eid, elemento) {
+    window.selecionarEvento = function(eid) {
         console.log('leitor.js: evento selecionado', eid);
         eventoSelecionado = eid;
 
-        document.querySelectorAll('.borda-visitas').forEach(el => {
-            el.style.opacity = "0.6";
-            el.classList.remove('selecionado');
-            el.querySelector('.botao-selecionar').innerText = "Selecionar";
-        });
-
-        const card = elemento.closest('.borda-visitas');
-        card.style.opacity = "1";
-        card.classList.add('selecionado');
-        elemento.innerText = "Selecionado";
-        showToast("Palestra selecionada com sucesso!", "success");
+        if (eid) {
+            showToast("Palestra selecionada com sucesso!", "success");
+        }
     }
 
     const html5QrCode = new Html5Qrcode("reader");
