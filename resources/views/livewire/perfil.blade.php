@@ -31,7 +31,9 @@
                         @endswitch
                     <!-- <a href="" class="infos-pessoas">Informações Pessoais</a> -->
                     <h1 class="qrcode">Qr code para marcar sua presença:<br></h1>
-                    <div id="qrcode"></div>
+                    <div style="background-color: #ffffff; padding: 15px; display: inline-block; border-radius: 10px; margin-top: 10px;">
+                        <div id="qrcode"></div>
+                    </div>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
                     <script>
                         document.addEventListener("DOMContentLoaded", function() {
