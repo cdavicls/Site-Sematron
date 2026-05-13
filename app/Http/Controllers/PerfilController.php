@@ -14,6 +14,6 @@ class PerfilController extends Controller
 
     $participante = DB::table('userdata')->where('uid', $user->uid)->orderBy('pid', 'desc')->first();
 
-    return view('perfil', compact('participante'));
+    return view('perfil', ['participante' => $participante]);
     }
 }
