@@ -44,9 +44,6 @@ Route::get('/palestras', GeneralController::class . '@palestras')->name('palestr
 
 Route::post('/presenca', [LeitorController::class, 'registrar']) ->name('registrar.presenca')->middleware('auth');
 
-Route::get('/leitor', [LeitorController::class, 'index'])->middleware('auth');
-Route::post('/presenca', [LeitorController::class, 'registrar']) ->name('registrar.presenca')->middleware('auth');
-
 Route::get('/login', fn () => view('login'))->name('login');
 
 Route::post('/login', [LoginController::class, 'authenticate'])->name('login.autenticar');
