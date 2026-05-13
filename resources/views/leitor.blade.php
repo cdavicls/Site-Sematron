@@ -80,21 +80,32 @@
 
             Html5Qrcode.getCameras().then(devices => {
                 if (devices && devices.length) {
+                    const cameraId = devices[0].id;
                     html5QrCode.start(
-                        devices[devices.length - 1].id,
-                            {
-                                fps: 10,
-                                qrbox: { width: 250, height: 250 }
-                            },
+                        cameraId,
+                        {
+                            fps: 10,
+                            qrbox: { width: 250, height: 250 }
+                        },
                         (decodedText) => {
-                        onScanSuccess(decodedText);
-                       }
-                    );
+                            onScanSuccess(decodedText);
+                        },
+                        (errorMessage) => {
+                            console.debug('QR scan error:', errorMessage);
+                        }
+                    ).catch(err => {
+                        console.error('Erro ao iniciar o leitor:', err);
+                        alert('Não foi possível iniciar a câmera. Verifique as permissões e se há uma câmera disponível.');
+                    });
+                } else {
+                    alert('Nenhuma câmera encontrada. Verifique seu dispositivo.');
                 }
+            }).catch(err => {
+                console.error('Erro ao buscar câmeras:', err);
+                alert('Não foi possível acessar as câmeras. Permita o uso da câmera no navegador.');
             });
 
             function onScanSuccess(decodedText) {
-
                 if (!eventoSelecionado) {
                     alert("Selecione a palestra antes de escanear!");
                     return;
@@ -106,11 +117,11 @@
                     let url = new URL(decodedText);
                     pid = url.searchParams.get("pid");
                 }
+
                 enviarPresenca(pid);
             }
 
             function enviarPresenca(pid) {
-
                 if (!eventoSelecionado) {
                     alert("Selecione uma palestra primeiro!");
                     return;
@@ -123,12 +134,21 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     body: JSON.stringify({
-                    pid: pid,
-                    eid: eventoSelecionado
-                   })
-               })
-                .then(res => res.json())
-                .then(data => alert(data.message));
+                        pid: pid,
+                        eid: eventoSelecionado
+                    })
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        return res.json().then(data => { throw new Error(data.message || 'Erro no servidor'); });
+                    }
+                    return res.json();
+                })
+                .then(data => alert(data.message))
+                .catch(err => {
+                    console.error('Erro ao enviar presença:', err);
+                    alert(err.message || 'Erro ao registrar presença.');
+                });
             }
         </script>
 @endsection@extends(auth()->check() ? 'layouts.layout-logado' : 'layouts.layout-basico')
