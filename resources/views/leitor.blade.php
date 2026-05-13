@@ -19,12 +19,6 @@
         width: 100%;
     }
 
-    #reader video {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: contain;
-    }
-
     /* Toast Notifications */
     #toast {
         visibility: hidden;
@@ -168,19 +162,12 @@
         }
     }
 
-    // Área responsiva para escaneamento
-    const qrboxFunction = (viewfinderWidth, viewfinderHeight) => {
-        const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-        const qrboxSize = Math.floor(minEdge * 0.8);
-        return { width: qrboxSize, height: qrboxSize };
-    };
-
     // Tenta usar a câmera traseira primeiro (environment)
     html5QrCode.start(
         { facingMode: "environment" },
         {
             fps: 10,
-            qrbox: qrboxFunction
+            qrbox: { width: 250, height: 250 }
         },
         (decodedText) => {
             onScanSuccess(decodedText);
