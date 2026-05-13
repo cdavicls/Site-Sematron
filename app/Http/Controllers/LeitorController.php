@@ -18,7 +18,7 @@ class LeitorController extends Controller
     public function registrar(Request $request)
     {
         $pid = $request->pid;
-        $eid = $request->eid;
+        $eid = (int) $request->eid;
 
         $inscricao = Inscricao::where('pid', $pid)->first();
 
