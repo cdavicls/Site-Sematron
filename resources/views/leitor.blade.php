@@ -11,7 +11,6 @@
 
 
         <section class="espaco-no-topo margem-esquerda">
-            <div class="imagem-de-fundo">
                 
                 @foreach($eventos as $evento)
                 <div class="borda-visitas">
@@ -28,8 +27,6 @@
                     <button class="botao-inscrever" onclick="selecionarEvento({{ $evento->eid }}, this)">Selecionar</button>
                 </div>
                 @endforeach
-
-            </div>
             <h1 class="Palavra-Atividades" style="margin-top: 40px;">
             Escaneie o QR Code do participante</h1>
             <div style="display: flex; justify-content: center; margin-top: 20px;">
@@ -63,9 +60,12 @@
 
         <script src="https://unpkg.com/html5-qrcode"></script>
         <script>
+            console.log('leitor.js: script carregado');
+
             let eventoSelecionado = null;
 
             function selecionarEvento(eid, elemento) {
+                console.log('leitor.js: evento selecionado', eid);
                 eventoSelecionado = eid;
 
                 document.querySelectorAll('.borda-visitas').forEach(el => {
@@ -77,10 +77,13 @@
             }
 
             const html5QrCode = new Html5Qrcode("reader");
+            console.log('leitor.js: Html5Qrcode instanciado');
 
             Html5Qrcode.getCameras().then(devices => {
+                console.log('leitor.js: câmeras encontradas', devices);
                 if (devices && devices.length) {
                     const cameraId = devices[0].id;
+                    console.log('leitor.js: usando câmera', cameraId);
                     html5QrCode.start(
                         cameraId,
                         {
@@ -88,41 +91,51 @@
                             qrbox: { width: 250, height: 250 }
                         },
                         (decodedText) => {
+                            console.log('leitor.js: QR detectado', decodedText);
                             onScanSuccess(decodedText);
                         },
                         (errorMessage) => {
-                            console.debug('QR scan error:', errorMessage);
+                            console.debug('leitor.js: erro de scan parcial', errorMessage);
                         }
-                    ).catch(err => {
-                        console.error('Erro ao iniciar o leitor:', err);
+                    ).then(() => {
+                        console.log('leitor.js: leitura iniciada com sucesso');
+                    }).catch(err => {
+                        console.error('leitor.js: erro ao iniciar o leitor', err);
                         alert('Não foi possível iniciar a câmera. Verifique as permissões e se há uma câmera disponível.');
                     });
                 } else {
+                    console.warn('leitor.js: nenhuma câmera disponível');
                     alert('Nenhuma câmera encontrada. Verifique seu dispositivo.');
                 }
             }).catch(err => {
-                console.error('Erro ao buscar câmeras:', err);
+                console.error('leitor.js: erro ao buscar câmeras', err);
                 alert('Não foi possível acessar as câmeras. Permita o uso da câmera no navegador.');
             });
 
             function onScanSuccess(decodedText) {
+                console.log('leitor.js: onScanSuccess chamado', decodedText);
                 if (!eventoSelecionado) {
+                    console.warn('leitor.js: sem evento selecionado');
                     alert("Selecione a palestra antes de escanear!");
                     return;
                 }
 
                 let pid = decodedText;
+                console.log('leitor.js: decodedText inicial', pid);
 
                 if (decodedText.includes("http")) {
                     let url = new URL(decodedText);
                     pid = url.searchParams.get("pid");
+                    console.log('leitor.js: pid extraído da URL', pid);
                 }
 
                 enviarPresenca(pid);
             }
 
             function enviarPresenca(pid) {
+                console.log('leitor.js: enviarPresenca chamado', { pid, eid: eventoSelecionado });
                 if (!eventoSelecionado) {
+                    console.warn('leitor.js: tentar enviar sem evento selecionado');
                     alert("Selecione uma palestra primeiro!");
                     return;
                 }
@@ -139,14 +152,18 @@
                     })
                 })
                 .then(res => {
+                    console.log('leitor.js: resposta fetch recebida', res.status);
                     if (!res.ok) {
                         return res.json().then(data => { throw new Error(data.message || 'Erro no servidor'); });
                     }
                     return res.json();
                 })
-                .then(data => alert(data.message))
+                .then(data => {
+                    console.log('leitor.js: presença registrada com sucesso', data);
+                    alert(data.message);
+                })
                 .catch(err => {
-                    console.error('Erro ao enviar presença:', err);
+                    console.error('leitor.js: erro ao enviar presença', err);
                     alert(err.message || 'Erro ao registrar presença.');
                 });
             }
