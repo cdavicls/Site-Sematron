@@ -41,7 +41,6 @@ Route::get('/visitas', GeneralController::class . '@visitas')->name('visitas');
 
 Route::get('/palestras', GeneralController::class . '@palestras')->name('palestras');
 
-Route::get('/leitor', [LeitorController::class, 'index'])->middleware('auth');
 Route::post('/presenca', [LeitorController::class, 'registrar']) ->name('registrar.presenca')->middleware('auth');
 
 Route::get('/login', fn () => view('login'))->name('login');
@@ -60,8 +59,6 @@ Route::get('/34st3r3gg', fn () => view('easteregg'))->name('easteregg');
 Route::get('/pao', fn () => view('pao'))->name('pao');
 
 Route::get('/perfil', [PerfilController::class, 'index'])->middleware('auth')->name('perfil');
-
-Route::get('/adm/list', [App\Http\Controllers\admController::class, 'showInscList'])->name('adm.list');
 
 Route::post('/inscricoes', [InscricaoController::class, 'store']);
 
@@ -87,6 +84,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     Route::middleware([GarantirUsuarioEhAdmin::class]) -> group(function(){
         Route::get('/adm/list', [admController::class, 'showInscList'])->name('adm.list');
+        Route::get('/adm/leitor', [LeitorController::class, 'index'])->name('adm.leitor_presenca');
     });
 
     Route::post('/logout', function (Request $request) {
