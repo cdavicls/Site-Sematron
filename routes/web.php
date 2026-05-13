@@ -13,7 +13,9 @@ use Laravel\Fortify\Features;
 use App\Http\Controllers\CadastroController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\InscricaoController;
+use App\Http\Controllers\PerfilController;
 use App\Http\Middleware\AutenticacaoInscricao;
+use App\Http\Controllers\LeitorController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\GeneralController;
 use App\Http\Middleware\GarantirUsuarioEhAdmin;
@@ -24,6 +26,10 @@ Route::get('/', GeneralController::class . '@inicio')->name('inicio');
 
 Route::get('/inicio', fn () => redirect('/'))->name('inicio.redirect');
 
+
+Route::get('/inscricao' , fn () => redirect('inscricao/create'));
+Route::resource('inscricao', InscricaoController::class) ->only(['create', 'store']) ->middleware(AutenticacaoInscricao::class);
+
 Route::get('/cadastro' , fn () => redirect('cadastro/create'));
 
 Route::resource('cadastro', CadastroController::class) ->only(['create', 'store']);
@@ -33,6 +39,9 @@ Route::get('/minicursos', GeneralController::class . '@minicursos')->name('minic
 Route::get('/visitas', GeneralController::class . '@visitas')->name('visitas');
 
 Route::get('/palestras', GeneralController::class . '@palestras')->name('palestras');
+
+Route::get('/leitor', [LeitorController::class, 'index'])->middleware('auth');
+Route::post('/presenca', [LeitorController::class, 'registrar']) ->name('registrar.presenca')->middleware('auth');
 
 Route::get('/login', fn () => view('login'))->name('login');
 
@@ -47,6 +56,11 @@ Route::get('/teste', [testeController::class, 'show']);
 Route::get('/esqueceu-a-senha', fn () => view('esqueceu-a-senha'))->name('esqueceu-a-senha');
 
 Route::get('/34st3r3gg', fn () => view('easteregg'))->name('easteregg');
+Route::get('/pao', fn () => view('pao'))->name('pao');
+
+Route::get('/perfil', [PerfilController::class, 'index'])->middleware('auth')->name('perfil');
+
+Route::get('/adm/list', [App\Http\Controllers\admController::class, 'showInscList'])->name('adm.list');
 
 Route::post('/inscricoes', [InscricaoController::class, 'store']);
 
