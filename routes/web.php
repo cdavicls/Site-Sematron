@@ -28,9 +28,6 @@ Route::get('/', GeneralController::class . '@inicio')->name('inicio');
 Route::get('/inicio', fn () => redirect('/'))->name('inicio.redirect');
 
 
-
-Route::get('/', fn () => view('inicio'))->name('home');
-
 Route::get('/inscricao' , fn () => redirect('inscricao/create'));
 Route::resource('inscricao', InscricaoController::class) ->only(['create', 'store']) ->middleware(AutenticacaoInscricao::class);
 
