@@ -11,6 +11,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\CertificateController;
 
 new #[Layout('layouts.layout-logado')] class extends Component
 {
@@ -38,7 +39,7 @@ new #[Layout('layouts.layout-logado')] class extends Component
             if($user->temInscricaoCompleta()){
                 return 'confirmed';
             }
-            $user_pids = Inscricao::where('uid',$user->uid)->where('sid',config('general.sematron_atual'))->pluck('pid');
+            $user_pids = Inscricao::where('uid',$user->uid)->where('sid', config('general.sematron_atual'))->pluck('pid');
             $first_sale = Sale::whereIn('pid',$user_pids)->first();
             if($first_sale==null){return 'failed';}
             return $first_sale->status;
@@ -102,6 +103,17 @@ new #[Layout('layouts.layout-logado')] class extends Component
         $user->nome_edicao = Sematron::where('sid', $this->sidSelecionada)->value('name');
 
         return $user;
+    }
+
+    #[Computed]
+    public function certificados()
+    {
+        if (!$this->userAtual) return [];
+
+        // Instanciamos o controller para reutilizar a lógica centralizada.
+        // Em projetos maiores, isso seria movido para um Service class.
+        $certController = new CertificateController();
+        return $certController->listForInscricao($this->userAtual->pid);
     }
 };
 ?>

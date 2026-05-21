@@ -60,6 +60,14 @@ return [
             'report' => false,
         ],
 
+        'certificados' => [
+            'driver' => 'local',
+            'root' => storage_path('app/certificados'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*

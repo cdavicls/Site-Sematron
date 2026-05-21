@@ -25,7 +25,8 @@ class Inscricao extends Model
         'viagem',
         'kit',
         'camiseta',
-        'alojamento'
+        'alojamento',
+        'status'
     ];
 
     protected $casts = [

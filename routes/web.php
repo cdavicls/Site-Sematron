@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\GeneralController;
 use App\Http\Middleware\GarantirUsuarioEhAdmin;
 use App\Http\Middleware\GarantirNaoEstaInscrito;
+use App\Http\Controllers\CertificateController;
 
 Route::get('/home', [GeneralController::class, 'inicio'])->name('home');
 Route::get('/', GeneralController::class . '@inicio')->name('inicio');
@@ -83,6 +84,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     
     });
+
+
+Route::get('/certificados/download/{file}', [CertificateController::class, 'download'])
+    ->name('certificados.download')
+    ->middleware('signed');
+
+Route::get('/certificados/gerar/{pid}/{type}', [CertificateController::class, 'generate'])
+    ->name('certificados.generate')
+    ->middleware('signed');
+
+// ── Rota de upload: apenas para administradores ──
+Route::post('/certificados/upload', [CertificateController::class, 'upload'])
+    ->name('certificados.upload')
+    ->middleware(['auth', GarantirUsuarioEhAdmin::class]);
     
 //rotas de teste, apagar quando entrar em produção
 Route::get('/testar-pagamento', function () {
