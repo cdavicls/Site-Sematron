@@ -17,6 +17,7 @@ use App\Http\Controllers\PerfilController;
 use App\Http\Middleware\AutenticacaoInscricao;
 use App\Http\Controllers\LeitorController;
 use Illuminate\Http\Request;
+
 use App\Http\Controllers\GeneralController;
 use App\Http\Middleware\GarantirUsuarioEhAdmin;
 use App\Http\Middleware\GarantirNaoEstaInscrito;
@@ -41,6 +42,9 @@ Route::get('/visitas', GeneralController::class . '@visitas')->name('visitas');
 
 Route::get('/palestras', GeneralController::class . '@palestras')->name('palestras');
 
+Route::post('/presenca', [LeitorController::class, 'registrar']) ->name('registrar.presenca')->middleware('auth');
+
+Route::get('/leitor', [LeitorController::class, 'index'])->middleware('auth');
 Route::post('/presenca', [LeitorController::class, 'registrar']) ->name('registrar.presenca')->middleware('auth');
 
 Route::get('/login', fn () => view('login'))->name('login');
