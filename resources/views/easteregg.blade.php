@@ -63,11 +63,14 @@
             <p>"Nah, I'd Win."</p>
             <span class="author">— **Adunas 025** (O Arquiteto / Ex-Gerente do TI)</span>
 
+            <p>"Às vezes a vida é sobre fazer escolhas burras"</p>
+            <span class="author">— **Nina 025** (A Curiosa / Pseudo-Gerente do Marketing)</span>
+
             <p>"Se te oferecerem a diretoria é muito importante que vc recuse."</p>
             <span class="author">— **CNH 023** (O Profeta / Ex-Diretor)</span>
 
             <p>"Em Briga de Saci, todo chute é voadora."</p>  
-            <span class="author">— **Luizinha 023** (O Filosofo / Ex-Diretor)</span>
+            <span class="author">— **Luizinha 023** (O Ditador / Ex-Diretor)</span>
 
             <p>"Se a vida te der limões, chupe-os. Porque é oq temos"</p>  
             <span class="author">— **Sena 025** (O justo / Ex-Diretor)</span>
