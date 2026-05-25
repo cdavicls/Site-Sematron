@@ -36,4 +36,20 @@ class Userlogin extends Authenticatable
         }
         return False;
     }
+    public function isAdmin(){
+        $sid = env('ATUAL_SID');
+        $gid = Inscricao::where('uid',$this->uid)->where('sid',$sid)->value('gid');
+        return $gid == 1;
+        }
+        
+    public function test(){
+        $func_logs = [
+            'uid' => $this->uid,
+            'sid' => env('ATUAL_SID'),
+            'has_insc' => $this->has_insc(),
+            'temInscricaoCompleta' => $this->temInscricaoCompleta(),
+            'isAdmin' => $this->isAdmin()
+            ];
+        return $func_logs;
+    }
 }

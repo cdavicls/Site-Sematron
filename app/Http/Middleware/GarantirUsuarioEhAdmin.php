@@ -17,7 +17,7 @@ class GarantirUsuarioEhAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::user()->gid !== 1) {
+        if (Auth::user()->isAdmin() == false) {
             return redirect()->route('inicio');
         }
         return $next($request);
