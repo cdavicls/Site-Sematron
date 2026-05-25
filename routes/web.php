@@ -84,6 +84,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware([GarantirUsuarioEhAdmin::class]) -> group(function(){
         Route::get('/adm/list', [admController::class, 'showInscList'])->name('adm.list');
                Route::get('/adm/list', [admController::class, 'showInscList'])->name('adm.list');
+        Route::get('adm/palestra_list', [admController::class, 'showPalestraList'])->name('adm.palestra_list');
         //Route::get('/adm/leitor', [LeitorController::class, 'index'])->name('adm.leitor_presenca')
         Route::get('/adm/cb185620a1b45a7a496e26bc79a4d0a093ccbc0eaa9a44da9bdcd7e4c470a80d', [LeitorController::class, 'index'])->name('adm.leitor_presenca1');
         Route::get('/adm/5ad5698e79dc1c0fa506f96bbaba99cafba00eacfd430115413b9ddd02f1d938', [LeitorController::class, 'index'])->name('adm.leitor_presenca2');

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Inscricao;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Eventos;
+use App\Models\Pack;
 
 class admController extends Controller
 {
@@ -36,5 +38,12 @@ class admController extends Controller
                                     WHERE userdata.sid = 22');
     
         return view('adm_list_insc',['participantes' => $resultados]);
+    }
+
+    public function showPalestraList()
+    {  
+        $eventos = Eventos::where('type', 'palestra')->where('sid', 22)->get();
+
+        return view('leitor', compact('eventos'));
     }
 }
