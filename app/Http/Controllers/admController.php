@@ -44,6 +44,6 @@ class admController extends Controller
     {  
         $eventos = Eventos::where('type', 'palestra')->where('sid', 22)->get();
 
-        return view('leitor', compact('eventos'));
+        return view('presence_per_lecture', compact('eventos'));
     }
 }
