@@ -18,9 +18,24 @@ class CertificateController extends Controller
     // No legado, esses caminhos eram montados com realpath/__DIR__
     // espalhados pelo código. Aqui ficam em um só lugar.
     // ─────────────────────────────────────────────────────────
-    private const TEMPLATE_PRESENCA  = 'templates/template_presenca.pdf';
-    private const TEMPLATE_MINICURSO = 'templates/template_minicurso.pdf';
-    private const TEMPLATE_VISITA    = 'templates/template_visita.pdf';
+    private const TEMPLATE_PRESENCA  = 'templates/21/template_presenca.pdf';
+    private const TEMPLATE_MINICURSO = 'templates/21/template_minicurso.pdf';
+    private const TEMPLATE_VISITA    = 'templates/21/template_visita.pdf';
+
+    private function template_presenca($sid)
+    {
+        return "templates/{$sid}/template_presence.pdf";
+    }
+
+    private function template_minicurso($sid)
+    {
+        return "templates/{$sid}/template_mini.pdf";
+    }
+
+    private function template_visita($sid)
+    {
+        return "templates/{$sid}/template_visita.pdf";
+    }
 
     /**
      * Equivalente ao getAll() do legado.
@@ -53,7 +68,7 @@ class CertificateController extends Controller
 
         // ── 2. Certificado de Presença (gerado dinamicamente via mPDF) ──
         // Equivalente ao bloco "if (file_exists($templatePresence))" do legado.
-        if (Storage::disk('certificados')->exists(self::TEMPLATE_PRESENCA)) {
+        if (Storage::disk('certificados')->exists($this->template_presenca($sid))) {
             if ($this->userHasMinPresence($inscricao)) {
                 $list[] = [
                     'type' => 'Presença',
@@ -67,7 +82,7 @@ class CertificateController extends Controller
 
         // ── 3. Certificado de Minicurso ──
         // Só aparece se o pagamento foi confirmado e o participante tem minicurso.
-        if (Storage::disk('certificados')->exists(self::TEMPLATE_MINICURSO)) {
+        if (Storage::disk('certificados')->exists($this->template_minicurso($sid))) {
             if ($inscricao->minicurso && $this->isPaymentConfirmed($inscricao)) {
                 $label = ($sid == 17) ? 'Minicurso Manhã' : 'Minicurso';
                 $list[] = [
@@ -81,7 +96,7 @@ class CertificateController extends Controller
         }
 
         // ── 4. Certificado de Visita ──
-        if (Storage::disk('certificados')->exists(self::TEMPLATE_VISITA)) {
+        if (Storage::disk('certificados')->exists($this->template_visita($sid))) {
             if ($inscricao->viagem && $this->isPaymentConfirmed($inscricao)) {
                 $list[] = [
                     'type' => 'Visita Técnica',
@@ -119,7 +134,7 @@ class CertificateController extends Controller
                 if (!$this->userHasMinPresence($inscricao)) {
                     abort(403, 'Presença mínima não atingida.');
                 }
-                $templatePath = Storage::disk('certificados')->path(self::TEMPLATE_PRESENCA);
+                $templatePath = Storage::disk('certificados')->path($this->template_presenca($inscricao->sid));
                 $texto = $this->buildTextoPresenca($inscricao);
                 break;
 
@@ -127,7 +142,7 @@ class CertificateController extends Controller
                 if (!$inscricao->minicurso || !$this->isPaymentConfirmed($inscricao)) {
                     abort(403, 'Acesso negado ao certificado de minicurso.');
                 }
-                $templatePath = Storage::disk('certificados')->path(self::TEMPLATE_MINICURSO);
+                $templatePath = Storage::disk('certificados')->path($this->template_minicurso($inscricao->sid));
                 $event = Event::where('eid', $inscricao->minicurso)->firstOrFail();
                 $texto = $this->buildTextoMinicurso($event, $inscricao);
                 break;
@@ -136,7 +151,7 @@ class CertificateController extends Controller
                 if (!$inscricao->viagem || !$this->isPaymentConfirmed($inscricao)) {
                     abort(403, 'Acesso negado ao certificado de visita.');
                 }
-                $templatePath = Storage::disk('certificados')->path(self::TEMPLATE_VISITA);
+                $templatePath = Storage::disk('certificados')->path($this->template_visita($inscricao->sid));
                 $event = Event::where('eid', $inscricao->viagem)->firstOrFail();
                 $texto = $this->buildTextoVisita($event, $inscricao);
                 break;
@@ -250,7 +265,7 @@ class CertificateController extends Controller
      * Aqui a lógica usa os dados que já existem no model Inscricao.
      * O campo 'presence' é um JSON array com os eids das palestras assistidas.
      *
-     * Ajuste o valor mínimo (60%) conforme a regra da Sematron.
+     * Ajuste o valor mínimo (70%) conforme a regra da Sematron.
      */
     private function userHasMinPresence(Inscricao $inscricao): bool
     {
@@ -271,8 +286,8 @@ class CertificateController extends Controller
 
         $percentual = ($totalPresenca / $totalPalestras) * 100;
 
-        // Regra: mínimo de 60% de presença para emitir certificado
-        return $percentual >= 60;
+        // Regra: mínimo de 70% de presença para emitir certificado
+        return $percentual >= 70;
     }
 
     /**
@@ -295,7 +310,7 @@ class CertificateController extends Controller
         // ou montar com o sid. Aqui usamos uma abordagem simples:
         return "Participou da {$inscricao->sid}ª Semana de Engenharia Mecatrônica "
              . "da Escola de Engenharia de São Carlos da Universidade de São Paulo, "
-             . "cumprindo o mínimo de 60% de presença nas atividades.";
+             . "cumprindo o mínimo de 70% de presença nas atividades.";
     }
 
     /**
