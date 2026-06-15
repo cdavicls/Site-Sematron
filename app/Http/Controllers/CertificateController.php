@@ -150,10 +150,10 @@ class CertificateController extends Controller
             case 'visita':
                 if (!$inscricao->viagem || !$this->isPaymentConfirmed($inscricao)) {
                     abort(403, 'Acesso negado ao certificado de visita.');
-                }
-                $templatePath = Storage::disk('certificados')->path($this->template_visita($inscricao->sid));
-                $event = Event::where('eid', $inscricao->viagem)->firstOrFail();
-                $texto = $this->buildTextoVisita($event, $inscricao);
+                    }
+                    $templatePath = Storage::disk('certificados')->path($this->template_visita($inscricao->sid));
+                    $event = Event::where('eid', $inscricao->viagem)->firstOrFail();
+                    $texto = $this->buildTextoVisita($event, $inscricao);
                 break;
 
             default:
@@ -168,8 +168,8 @@ class CertificateController extends Controller
         // Configuração idêntica ao sistema legado: sem margens, modo paisagem.
         $mpdf = new Mpdf([
             'orientation'    => 'L', // Landscape (paisagem)
-            'margin_left'    => 0,
-            'margin_right'   => 0,
+            'margin_left'    => 1,
+            'margin_right'   => 1,
             'margin_top'     => 0,
             'margin_bottom'  => 0,
             // O diretório temp do mPDF deve ser gravável.
@@ -188,14 +188,14 @@ class CertificateController extends Controller
         // ── Escreve o nome do participante ──
         // As coordenadas (0, 84) e o estilo de fonte são os mesmos do sistema antigo.
         // Ajuste os valores de X, Y, largura e tamanho de fonte conforme necessário.
-        $mpdf->SetXY(0, 84);
-        $mpdf->SetFont('Arial', '', 40);
+        $mpdf->SetXY(0, 90);
+        $mpdf->SetFont('Arial', '', 38);
         $mpdf->WriteCell(297, 25, $name, 0, 0, 'C'); // 297mm = largura de um A4
 
         // ── Escreve o texto descritivo ──
         $mpdf->SetXY(18, 110);
         $mpdf->SetFont('Arial', '', 17);
-        $mpdf->MultiCell(260, 10, $texto);
+        $mpdf->MultiCell(260, 10, $texto,0,'C');
 
         // ── Entrega o PDF ao navegador ──
         // 'S' (String) devolve o conteúdo como string em vez de imprimir headers diretamente.
