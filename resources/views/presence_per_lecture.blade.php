@@ -3,5 +3,5 @@
 @section('title', 'Presença por Palestra')
 
 @section('content')
-@livewire('presence_per_lecture')
+    @livewire('presence_per_lecture')
 @endsection
