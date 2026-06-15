@@ -17,9 +17,11 @@ use App\Http\Controllers\PerfilController;
 use App\Http\Middleware\AutenticacaoInscricao;
 use App\Http\Controllers\LeitorController;
 use Illuminate\Http\Request;
+
 use App\Http\Controllers\GeneralController;
 use App\Http\Middleware\GarantirUsuarioEhAdmin;
 use App\Http\Middleware\GarantirNaoEstaInscrito;
+use App\Http\Controllers\CertificateController;
 
 Route::get('/home', [GeneralController::class, 'inicio'])->name('home');
 Route::get('/', GeneralController::class . '@inicio')->name('inicio');
@@ -84,14 +86,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('d2d38e1ec08/adm/palestra_list', [admController::class, 'showPalestraList'])->name('adm.palestra_list');
     Route::middleware([GarantirUsuarioEhAdmin::class]) -> group(function(){
         Route::get('/adm/list', [admController::class, 'showInscList'])->name('adm.list');
-               Route::get('/adm/list', [admController::class, 'showInscList'])->name('adm.list');
-        //Route::get('/adm/leitor', [LeitorController::class, 'index'])->name('adm.leitor_presenca')
-        //Route::get('/adm/cb185620a1b45a7a496e26bc79a4d0a093ccbc0eaa9a44da9bdcd7e4c470a80d', [LeitorController::class, 'index'])->name('adm.leitor_presenca1');
-        Route::get('/adm/5ad5698e79dc1c0fa506f96bbaba99cafba00eacfd430115413b9ddd02f1d938', [LeitorController::class, 'index'])->name('adm.leitor_presenca2');
-        Route::get('/adm/037b90bb37900a8b84977458526f823da4de1985628938af54ab6f9cfe96d3c0', [LeitorController::class, 'index'])->name('adm.leitor_presenca3');
-        Route::get('/adm/5d2d38e1ec0829df48e6f2cf9b0bb40e581d5f96f87d25ae249a58c24cbb08f8', [LeitorController::class, 'index'])->name('adm.leitor_presenca4');
-        
-    });
+        Route::get('/adm/list', [admController::class, 'showInscList'])->name('adm.list');
+        Route::get('/adm/leitor', [LeitorController::class, 'index'])->name('adm.leitor_presenca');
+        });
 
     Route::post('/logout', function (Request $request) {
         Auth::logout();
@@ -102,6 +99,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     
     });
+
+
+Route::get('/certificados/download/{file}', [CertificateController::class, 'download'])
+    ->name('certificados.download')
+    ->middleware('signed');
+
+Route::get('/certificados/gerar/{pid}/{type}', [CertificateController::class, 'generate'])
+    ->name('certificados.generate')
+    ->middleware('signed');
+
+// ── Rota de upload: apenas para administradores ──
+Route::post('/certificados/upload', [CertificateController::class, 'upload'])
+    ->name('certificados.upload')
+    ->middleware(['auth', GarantirUsuarioEhAdmin::class]);
     
 //rotas de teste, apagar quando entrar em produção
 Route::get('/testar-pagamento', function () {

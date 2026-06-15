@@ -18,7 +18,8 @@
         "laravel/wayfinder": "^0.1.9",
         "livewire/livewire": "*",
         "livewire/volt": "*",
-        "mercadopago/dx-php": "3.8.0"
+        "mercadopago/dx-php": "3.8.0",
+        "mpdf/mpdf": "^8.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
