@@ -11,6 +11,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\CertificateController;
 
 new #[Layout('layouts.layout-logado')] class extends Component
 {
@@ -38,7 +39,7 @@ new #[Layout('layouts.layout-logado')] class extends Component
             if($user->temInscricaoCompleta()){
                 return 'confirmed';
             }
-            $user_pids = Inscricao::where('uid',$user->uid)->where('sid',config('general.sematron_atual'))->pluck('pid');
+            $user_pids = Inscricao::where('uid',$user->uid)->where('sid', config('general.sematron_atual'))->pluck('pid');
             $first_sale = Sale::whereIn('pid',$user_pids)->first();
             if($first_sale==null){return 'failed';}
             return $first_sale->status;
@@ -63,18 +64,18 @@ new #[Layout('layouts.layout-logado')] class extends Component
             return null;
         }
 
-        $user = Inscricao::where('uid', Auth::user()->uid)
+        $inscrito = Inscricao::where('uid', Auth::user()->uid)
                         ->where('sid', $this->sidSelecionada)
                         ->first();
 
-        if (!$user) {
+        if (!$inscrito) {
             return null;
         }
 
         // Lógica de Presença
-        $presence = is_string($user->presence) 
-            ? json_decode($user->presence, true) 
-            : $user->presence;
+        $presence = is_string($inscrito->presence) 
+            ? json_decode($inscrito->presence, true) 
+            : $inscrito->presence;
 
         if (is_array($presence)){
             $totalPresenca = count($presence);
@@ -83,25 +84,36 @@ new #[Layout('layouts.layout-logado')] class extends Component
         }
 
         $n_palestras = Event::where('type', 'palestra')
-                            ->where('sid', $user->sid)
+                            ->where('sid', $inscrito->sid)
                             ->count();
 
         if($n_palestras > 0){
-            $user->presenca_calculada = ceil(($totalPresenca / $n_palestras) * 100);
+            $inscrito->presenca_calculada = ceil(($totalPresenca / $n_palestras) * 100);
         } else {
-            $user->presenca_calculada = 0;
+            $inscrito->presenca_calculada = 0;
         }
 
         // Busca Nomes
-        $user->minicurso_n = Event::where('eid', $user->minicurso)->value('name') ?? 'Não selecionado';
-        $user->viagem_n    = Event::where('eid', $user->viagem)->value('name') ?? 'Não selecionado';
-        $user->camiseta_n  = $user->camiseta ? strtoupper($user->camiseta) : 'N/A';
-        $user->pack_id_n   = Pack::where('id', $user->pack_id)->value('nome') ?? 'Não disponível';
+        $inscrito->minicurso_n = Event::where('eid', $inscrito->minicurso)->value('name') ?? 'Não selecionado';
+        $inscrito->viagem_n    = Event::where('eid', $inscrito->viagem)->value('name') ?? 'Não selecionado';
+        $inscrito->camiseta_n  = $inscrito->camiseta ? strtoupper($inscrito->camiseta) : 'N/A';
+        $inscrito->pack_id_n   = Pack::where('id', $inscrito->pack_id)->value('nome') ?? 'Não disponível';
 
         // CORREÇÃO: Adicionando o nome_edicao para usar no título da view!
-        $user->nome_edicao = Sematron::where('sid', $this->sidSelecionada)->value('name');
+        $inscrito->nome_edicao = Sematron::where('sid', $this->sidSelecionada)->value('name');
 
-        return $user;
+        return $inscrito;
+    }
+
+    #[Computed]
+    public function certificados()
+    {
+        if (!$this->userAtual) return [];
+
+        // Instanciamos o controller para reutilizar a lógica centralizada.
+        // Em projetos maiores, isso seria movido para um Service class.
+        $certController = new CertificateController();
+        return $certController->listForInscricao($this->userAtual->pid);
     }
 };
 ?>

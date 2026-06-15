@@ -116,16 +116,34 @@
                 </div>
 
                 <div class="borda-certificado">
-                    <div class="certificados">
-                        <h1 class="palavra-certificado">Certificados</h1>
-                    </div>
+    <div class="certificados">
+        <h1 class="palavra-certificado">Certificados</h1>
+    </div>
 
-                    <div class="espacamento-boto">
-                        <a href="" class="botoes-perfil">Presença</a>
-                        <a href="" class="botoes-perfil">Minicurso</a>
-                        <a href="" class="botoes-perfil">Visita</a>
-                    </div>
-                </div>
+    <div class="espacamento-boto">
+        {{--
+            $this->certificados é a propriedade computada do Livewire.
+            Ela retorna um array de ['type' => '...', 'url' => '...'].
+            Se estiver vazia, exibe uma mensagem amigável.
+        --}}
+        @forelse($this->certificados as $cert)
+            {{--
+                Usamos target="_blank" para abrir o PDF em uma nova aba.
+                A URL já contém a assinatura — não precisamos fazer mais nada.
+            --}}
+            <a href="{{ $cert['url'] }}"
+               target="_blank"
+               class="botoes-perfil">
+                {{ $cert['type'] }}
+            </a>
+        @empty
+            <p class="SubTit-Perfil" style="font-size: 0.9rem; color: #888;">
+                Nenhum certificado disponível ainda.<br>
+                <small>Os certificados são liberados após o evento e a confirmação de pagamento.</small>
+            </p>
+        @endforelse
+    </div>
+</div>
             </div>
         </section>
     @else
