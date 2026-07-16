@@ -1,3 +1,10 @@
+---
+type: submodule
+status: active
+updated: "2026-07-16"
+tags: [submodule, sematron, web-dev, laravel, tailwind]
+---
+
 ## 🚀 Como rodar o projeto localmente
 
 Siga os passos abaixo para clonar e configurar o projeto na sua máquina.
