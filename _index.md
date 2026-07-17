@@ -23,27 +23,27 @@ Repositório do site da SEMATRON (Semana da Engenharia Mecatrônica) — Laravel
 ### app/
 Lógica do servidor — Controllers, Models, Middleware, Services.
 
-→ [app/](app/)
+→ [app/](Home/Faculdade/Sematron/Site-Sematron/app/)
 
 ### resources/
 Frontend — componentes React, hooks, layouts, CSS.
 
-→ [resources/](resources/)
+→ [resources/](Home/Faculdade/Sematron/Site-Sematron/resources/)
 
 ### routes/
 Definições de rotas da aplicação.
 
-→ [routes/](routes/)
+→ [routes/](Home/Faculdade/Sematron/Site-Sematron/routes/)
 
 ### database/
 Migrations, factories e seeders do banco de dados.
 
-→ [database/](database/)
+→ [database/](Home/Faculdade/Sematron/Site-Sematron/database/)
 
 ### config/
 Arquivos de configuração do Laravel.
 
-→ [config/](config/)
+→ [config/](Home/Faculdade/Sematron/Site-Sematron/config/)
 
 ## Regras
 
